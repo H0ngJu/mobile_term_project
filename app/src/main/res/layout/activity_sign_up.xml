@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        android:text="회원가입"
+        android:textColor="#000000"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="341dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="40dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_marginBottom="34dp"
+                    android:layout_marginLeft="8dp"
+                    android:text="닉네임"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/Nickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8sp"
+                    android:backgroundTint="#000000"
+                    android:ems="10"
+                    android:layout_gravity="bottom"
+                    android:hint="닉네임은 한 글자 이상이어야 합니다."
+                    android:inputType="text"
+                    android:textColor="#000000"
+                    android:textColorHint="#8D000000" />
+
+                <Button
+                    android:id="@+id/BtnCheckNickname"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="right|top"
+                    android:backgroundTint="#FFFFFF"
+                    android:text="중복확인"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:padding="1sp"
+                    android:textSize="12sp"/>
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_marginBottom="34dp"
+                    android:layout_marginLeft="8dp"
+                    android:text="비밀번호"
+                    android:textColor="#000000"
+                    android:textSize="18sp"  />
+
+                <EditText
+                    android:id="@+id/Password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8sp"
+                    android:backgroundTint="#000000"
+                    android:ems="10"
+                    android:layout_gravity="bottom"
+                    android:hint="비밀번호는 12자리 이하로 입력하세요."
+                    android:inputType="textPassword"
+                    android:textColor="#000000"
+                    android:textColorHint="#8D000000" />
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_marginBottom="34dp"
+                    android:layout_marginLeft="8dp"
+                    android:text="비밀번호 확인"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/CheckPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8sp"
+                    android:backgroundTint="#000000"
+                    android:ems="10"
+                    android:layout_gravity="bottom"
+                    android:inputType="textPassword"
+                    android:textColor="#000000"
+                    android:textColorHint="#8D000000" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/BtnSignUp"
+        android:layout_width="200sp"
+        android:layout_height="50sp"
+        android:layout_gravity="center"
+        android:backgroundTint="#FFFFFF"
+        android:text="완료"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_marginTop="30sp"
+        android:padding="1sp" />
+
+
+
+</LinearLayout>
