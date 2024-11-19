@@ -1,6 +1,8 @@
 package com.example.mobile_term_project;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -54,5 +56,39 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         db.execSQL(STEP_SQL_DELETE_ENTRIES);
         onCreate(db);
+    }
+
+    //닉네임 중복 확인
+    public boolean checkNickname(String inputNickname) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        boolean exists = false;
+
+        String query = "SELECT 1 FROM " + TableInfo.MemberEntry.TABLE_NAME + " WHERE " + TableInfo.MemberEntry.COLUMN_NAME_NICKNAME + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{inputNickname})) {
+            if(cursor.moveToFirst()) {
+                exists = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            db.close();
+        }
+        return exists;
+    }
+
+    //db에 member 추가
+    public long addMember (String nickname, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(TableInfo.MemberEntry.COLUMN_NAME_NICKNAME, nickname);
+        values.put(TableInfo.MemberEntry.COLUMN_NAME_PASSWORD, password);
+
+        long result = db.insert(TableInfo.MemberEntry.TABLE_NAME, null, values);
+        db.close();
+
+        return result;
     }
 }
