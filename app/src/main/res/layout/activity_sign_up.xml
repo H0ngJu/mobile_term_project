@@ -97,7 +97,7 @@
                     android:backgroundTint="#000000"
                     android:ems="10"
                     android:layout_gravity="bottom"
-                    android:hint="비밀번호는 12자리 이하로 입력하세요."
+                    android:hint="비밀번호는 4자리 이상으로 입력하세요."
                     android:inputType="textPassword"
                     android:textColor="#000000"
                     android:textColorHint="#8D000000" />
@@ -137,9 +137,18 @@
                     android:textColor="#000000"
                     android:textColorHint="#8D000000" />
 
+
             </FrameLayout>
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/ErrorPwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:textSize="13sp" />
+
     </LinearLayout>
 
     <Button
