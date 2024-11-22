@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import java.lang.reflect.Member;
+
 public class SQLiteHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
@@ -91,4 +93,16 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         return result;
     }
+
+    //로그인
+    public Cursor login (String nickname, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TableInfo.MemberEntry.TABLE_NAME +
+                " WHERE " + TableInfo.MemberEntry.COLUMN_NAME_NICKNAME + " = ? AND " +
+                TableInfo.MemberEntry.COLUMN_NAME_PASSWORD + " = ?";
+
+        return db.rawQuery(query, new String[]{nickname, password});
+    }
+
+
 }
