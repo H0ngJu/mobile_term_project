@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.mobile_term_project" >
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- 인터넷 사용 권한 설정 -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -32,8 +33,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".StepCounterActivity" />
+        <activity android:name=".EndofStepCounterActivity" />
 
     </application>
-
 </manifest>

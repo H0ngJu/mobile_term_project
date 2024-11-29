@@ -14,6 +14,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,11 +42,20 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.BtnLogin);
         btnLogout = findViewById(R.id.BtnLogout);
         mapView = findViewById(R.id.MapView);
+        Button moveToStepCounterButton = findViewById(R.id.moveToStepCounterButton);
 
         nickname = findViewById(R.id.Nickname);
 
         afterLogin = findViewById(R.id.AfterLogin);
         beforeLogin = findViewById(R.id.BeforeLogin);
+        
+        //걸음수 
+        moveToStepCounterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StepCounterActivity.class);
+                }
+        });
 
 
         //회원가입
@@ -135,6 +147,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
     }
 
     private void afterLogin () {
