@@ -2,6 +2,7 @@ package com.example.mobile_term_project;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,15 +11,17 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class StepCounterActivity extends AppCompatActivity implements SensorEventListener {
 
     private TextView stepCountText;
+    private Button stopButton; // 종료하기 버튼
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
     private int stepCount = 0;
@@ -29,6 +32,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         setContentView(R.layout.activity_step_counter);
 
         stepCountText = findViewById(R.id.stepCountText);
+        stopButton = findViewById(R.id.stopButton); // 종료하기 버튼
 
         // 권한 확인 및 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10 이상에서 권한 확인
@@ -40,6 +44,23 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         } else {
             initializeSensor();
         }
+
+        // 종료하기 버튼 클릭 이벤트
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 걸음 수 저장
+                StepDataStoreModel.setStepCount(stepCount);
+                Toast.makeText(StepCounterActivity.this, "걸음 수 저장 완료: " + stepCount, Toast.LENGTH_SHORT).show();
+
+                // 다음 Activity로 이동
+                Intent intent = new Intent(StepCounterActivity.this, EndofStepCounterActivity.class);
+                startActivity(intent);
+
+                // 현재 Activity 종료
+                finish();
+            }
+        });
     }
 
     // 권한 요청 결과 처리
@@ -74,7 +95,7 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("StepCounterActivity", "onResume called");
+        Log.d("StepCounterActivity", "onResume 호출");
 
         if (sensorManager == null) {
             Log.e("StepCounterActivity", "SensorManager is NULL");
@@ -84,9 +105,9 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         if (stepCounterSensor != null) {
             boolean isRegistered = sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI);
             if (isRegistered) {
-                Log.d("StepCounterActivity", "Sensor Listener successfully registered");
+                Log.d("StepCounterActivity", "Sensor Listener 등록 완료");
             } else {
-                Log.e("StepCounterActivity", "Failed to register Sensor Listener");
+                Log.e("StepCounterActivity", "Sensor Listener 등록 실패");
             }
         } else {
             Log.e("StepCounterActivity", "Step Counter Sensor is NULL");
@@ -111,7 +132,6 @@ public class StepCounterActivity extends AppCompatActivity implements SensorEven
         }
     }
 
-    // 이건 아직 안씀
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.d("StepCounterActivity", "Sensor accuracy changed: " + accuracy);

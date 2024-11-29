@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".StepCounterActivity" />
+        <activity android:name=".EndofStepCounterActivity" />
     </application>
 
 </manifest>
