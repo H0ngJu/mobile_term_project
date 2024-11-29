@@ -12,7 +12,7 @@ import java.lang.reflect.Member;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "MobileProgramming.db";
 
     public static final String MEMBER_SQL_CREATE_ENTRIES =
@@ -28,6 +28,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     TableInfo.StepRecordEntry._ID + " INTEGER PRIMARY KEY," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_COUNT + " TEXT," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE + " TEXT," +
+                    TableInfo.StepRecordEntry.COLUMN_NAME_START_TIME + " TEXT," +
+                    TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME + " TEXT," +
+                    TableInfo.StepRecordEntry.COLUMN_NAME_IMAGE + " BLOB," + //이미지파일 데이터를 BLOB로 저장
                     TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID + " INTEGER," +
                     "FOREIGN KEY(" + TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID + ") REFERENCES " +
                     TableInfo.MemberEntry.TABLE_NAME + "(" + TableInfo.MemberEntry._ID + "))";
@@ -54,8 +57,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(MEMBER_SQL_DELETE_ENTRIES);
-        onCreate(db);
-
         db.execSQL(STEP_SQL_DELETE_ENTRIES);
         onCreate(db);
     }
