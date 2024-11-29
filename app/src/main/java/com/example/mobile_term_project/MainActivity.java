@@ -1,32 +1,25 @@
 package com.example.mobile_term_project;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
     SQLiteHelper sqLiteHelper;
     SharedPreferences sharedPreferences;
-    Button btnSignUp, btnLogin, loginComplete, btnLogout;
+    Button btnSignUp, btnLogin, loginComplete, btnLogout, mapView;
     View dialogView;
     EditText loginNickname, loginPassword;
     TextView loginError, nickname;
@@ -45,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         btnSignUp = findViewById(R.id.BtnSignUp);
         btnLogin = findViewById(R.id.BtnLogin);
         btnLogout = findViewById(R.id.BtnLogout);
+        mapView = findViewById(R.id.MapView);
 
         nickname = findViewById(R.id.Nickname);
 
@@ -52,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         beforeLogin = findViewById(R.id.BeforeLogin);
 
 
+        //회원가입
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,6 +124,15 @@ public class MainActivity extends AppCompatActivity {
                 beforeLogin.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "로그아웃 완료되었습니다.", Toast.LENGTH_SHORT).show();
 
+            }
+        });
+
+        //지도 액티비티로 이동
+        mapView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, WalkingMap.class);
+                startActivity(intent);
             }
         });
     }

@@ -60,4 +60,12 @@
         </LinearLayout>
     </FrameLayout>
 
+    <!--임시로 지도 보러가기 -->
+    <Button
+        android:id="@+id/MapView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="지도 보기"
+        android:textSize="20sp" />
+
 </LinearLayout>
