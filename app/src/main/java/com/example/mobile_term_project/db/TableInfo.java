@@ -1,4 +1,4 @@
-package com.example.mobile_term_project;
+package com.example.mobile_term_project.db;
 
 import android.provider.BaseColumns;
 
