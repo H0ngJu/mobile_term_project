@@ -1,4 +1,4 @@
-package com.example.mobile_term_project;
+package com.example.mobile_term_project.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import java.lang.reflect.Member;
+import com.example.mobile_term_project.db.TableInfo;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
