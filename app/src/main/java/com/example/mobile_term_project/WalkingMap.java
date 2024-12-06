@@ -18,6 +18,13 @@ import com.kakao.vectormap.LatLng;
 import com.kakao.vectormap.MapLifeCycleCallback;
 import com.kakao.vectormap.MapView;
 import com.kakao.vectormap.MapViewInfo;
+import com.kakao.vectormap.label.Label;
+import com.kakao.vectormap.label.LabelLayer;
+import com.kakao.vectormap.label.LabelOptions;
+import com.kakao.vectormap.label.LabelStyle;
+import com.kakao.vectormap.label.LabelStyles;
+import com.kakao.vectormap.label.PathOptions;
+import com.kakao.vectormap.label.TrackingManager;
 import com.kakao.vectormap.route.RouteLine;
 import com.kakao.vectormap.route.RouteLineLayer;
 import com.kakao.vectormap.route.RouteLineOptions;
@@ -38,7 +45,7 @@ public class WalkingMap extends AppCompatActivity {
     EditText coordinate;
     Button btn;
 
-    List<LatLng> routePath = new ArrayList<>();
+    ArrayList<LatLng> routePath = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,11 +156,11 @@ public class WalkingMap extends AppCompatActivity {
     }
 
 
-    public void drawRoutePath(List<LatLng> startPoint) {
+    public void drawRoutePath(ArrayList<LatLng> startPoint) {
         RouteLineLayer layer = kakaoMap.getRouteLineManager().getLayer(); //디폴트로 생성된 layer를 가져옴
 
         RouteLineStylesSet stylesSet = RouteLineStylesSet.from("defaultStyle",
-                RouteLineStyles.from(RouteLineStyle.from(16, Color.BLUE))); //모든 줌레벨, 라인두께 16px, 파란색 스타일
+                RouteLineStyles.from(RouteLineStyle.from(16, Color.RED))); //모든 줌레벨, 라인두께 16px, 파란색 스타일
 
         RouteLineSegment segment = RouteLineSegment.from(startPoint)
                 .setStyles(stylesSet.getStyles(0));
@@ -161,18 +168,43 @@ public class WalkingMap extends AppCompatActivity {
         RouteLineOptions options = RouteLineOptions.from("default",segment).setStylesSet(stylesSet);
         RouteLine routeLine = layer.addRouteLine(options);
         routeLine.show();
+
+        setUpLabel(startPoint.get(startPoint.size()-1));
     }
 
-    public void updateRoutePath(List<LatLng> newPath) {
+    public void updateRoutePath(ArrayList<LatLng> newPath) {
         RouteLineLayer layer = kakaoMap.getRouteLineManager().getLayer();
 
         RouteLineStylesSet stylesSet = RouteLineStylesSet.from("defaultStyle",
-                RouteLineStyles.from(RouteLineStyle.from(16, Color.BLUE)));
+                RouteLineStyles.from(RouteLineStyle.from(16, Color.RED)));
 
         RouteLineSegment newSegment = RouteLineSegment.from(newPath).setStyles(stylesSet.getStyles(0));
 
         RouteLine routeLine = layer.getRouteLine("default");
         routeLine.changeSegments(newSegment);
+
+        updateLabel(newPath.get(newPath.size()-1));
+    }
+
+    //label
+    public void setUpLabel (LatLng startPoint) {
+        LabelStyles styles = kakaoMap.getLabelManager().addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.image2)));
+        LabelOptions options = LabelOptions.from("default", startPoint).setStyles(styles);
+
+        LabelLayer layer = kakaoMap.getLabelManager().getLayer(); //디폴트로 생성된 레이어
+        Label label = layer.addLabel(options);
+
+        TrackingManager trackingManager = kakaoMap.getTrackingManager();
+        trackingManager.startTracking(label);
+    }
+
+    public void updateLabel (LatLng newPoint) { //TODO: try-catch 추가
+        LabelLayer layer = kakaoMap.getLabelManager().getLayer();
+        Label label = layer.getLabel("default");
+        label.moveTo(newPoint);
+
+        TrackingManager trackingManager = kakaoMap.getTrackingManager();
+        trackingManager.startTracking(label);
     }
 
 
