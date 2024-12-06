@@ -1,11 +1,15 @@
 package com.example.mobile_term_project;
 
 import static android.content.ContentValues.TAG;
-import static com.kakao.vectormap.MapType.NORMAL;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.kakao.vectormap.KakaoMap;
 import com.kakao.vectormap.KakaoMapReadyCallback;
@@ -14,10 +18,27 @@ import com.kakao.vectormap.LatLng;
 import com.kakao.vectormap.MapLifeCycleCallback;
 import com.kakao.vectormap.MapView;
 import com.kakao.vectormap.MapViewInfo;
+import com.kakao.vectormap.route.RouteLine;
+import com.kakao.vectormap.route.RouteLineLayer;
+import com.kakao.vectormap.route.RouteLineOptions;
+import com.kakao.vectormap.route.RouteLineSegment;
+import com.kakao.vectormap.route.RouteLineStyle;
+import com.kakao.vectormap.route.RouteLineStyles;
+import com.kakao.vectormap.route.RouteLineStylesSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WalkingMap extends AppCompatActivity {
 
     MapView mapView;
+    KakaoMap kakaoMap;
+
+    //GPS 구현 전 임시로
+    EditText coordinate;
+    Button btn;
+
+    List<LatLng> routePath = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +54,9 @@ public class WalkingMap extends AppCompatActivity {
         }
 
         mapView = findViewById(R.id.map_view);
+        coordinate = findViewById(R.id.Coordinate);
+        btn = findViewById(R.id.Btn);
+
         mapView.start(new MapLifeCycleCallback() {
             @Override
             public void onMapDestroy() {
@@ -48,26 +72,19 @@ public class WalkingMap extends AppCompatActivity {
             }
 
 
+
         },
 
         new KakaoMapReadyCallback() {
             @Override
-            public void onMapReady(KakaoMap kakaoMap) {
+            public void onMapReady(KakaoMap map) {
                 // 인증 후 API가 정상적으로 실행될 때 호출됨
-                if (kakaoMap != null) {
-                    Log.d("KakaoMapReady", "Map is ready");
-                } else {
-                    Log.e("KakaoMapReady", "Map is not ready - KakaoMap object is null");
-                }
-
-
+                kakaoMap = map;
+                routePath.add(LatLng.from(37.401750, 127.109656));
+                routePath.add(LatLng.from(37.396374, 127.109653)); //잘 보이게 하려고 일단 기본으로 넣어둠
+                drawRoutePath(routePath);
             }
 
-            @Override
-            public LatLng getPosition() {
-                // 지도 시작 시 위치 좌표를 설정
-                return LatLng.from(37.406960, 127.115587);
-            }
 
             @Override
             public int getZoomLevel() {
@@ -83,6 +100,29 @@ public class WalkingMap extends AppCompatActivity {
 
         }
         );
+
+        //GPS 구현 전 RouteLine 변경 테스트를 위해서 사용
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text = coordinate.getText().toString().trim();
+
+                String[] tmp = text.split(",\\s*");
+                if(tmp.length == 2) {
+                    double latitude = Double.parseDouble(tmp[0]);
+                    double longitude = Double.parseDouble(tmp[1]);
+
+                    routePath.add(LatLng.from(latitude,longitude));
+                    updateRoutePath(routePath);
+
+                    coordinate.setText(null);
+
+                } else {
+                    Log.d("EditTextInput", "input error");
+                }
+            }
+        });
+
     }
 
     @Override
@@ -107,4 +147,33 @@ public class WalkingMap extends AppCompatActivity {
         }
 
     }
+
+
+    public void drawRoutePath(List<LatLng> startPoint) {
+        RouteLineLayer layer = kakaoMap.getRouteLineManager().getLayer(); //디폴트로 생성된 layer를 가져옴
+
+        RouteLineStylesSet stylesSet = RouteLineStylesSet.from("defaultStyle",
+                RouteLineStyles.from(RouteLineStyle.from(16, Color.BLUE))); //모든 줌레벨, 라인두께 16px, 파란색 스타일
+
+        RouteLineSegment segment = RouteLineSegment.from(startPoint)
+                .setStyles(stylesSet.getStyles(0));
+
+        RouteLineOptions options = RouteLineOptions.from("default",segment).setStylesSet(stylesSet);
+        RouteLine routeLine = layer.addRouteLine(options);
+        routeLine.show();
+    }
+
+    public void updateRoutePath(List<LatLng> newPath) {
+        RouteLineLayer layer = kakaoMap.getRouteLineManager().getLayer();
+
+        RouteLineStylesSet stylesSet = RouteLineStylesSet.from("defaultStyle",
+                RouteLineStyles.from(RouteLineStyle.from(16, Color.BLUE)));
+
+        RouteLineSegment newSegment = RouteLineSegment.from(newPath).setStyles(stylesSet.getStyles(0));
+
+        RouteLine routeLine = layer.getRouteLine("default");
+        routeLine.changeSegments(newSegment);
+    }
+
+
 }
