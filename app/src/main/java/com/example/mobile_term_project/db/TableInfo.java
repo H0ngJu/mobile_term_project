@@ -1,4 +1,4 @@
-package com.example.mobile_term_project;
+package com.example.mobile_term_project.db;
 
 import android.provider.BaseColumns;
 
@@ -18,5 +18,9 @@ public class TableInfo {
         public static final String COLUMN_NAME_MEMBER_ID = "member_id"; //BaseColums의 default로 생선된 member 테이블의 id는  _id 형태의 도메인임;;;
         public static final String COLUMN_NAME_COUNT = "count";
         public static final String COLUMN_NAME_DISTANCE = "distance";
+
+        public static final String COLUMN_NAME_START_TIME = "start_time";
+        public static final String COLUMN_NAME_END_TIME = "end_time";
+        public static final String COLUMN_NAME_IMAGE = "image";
     }
 }
