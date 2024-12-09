@@ -14,9 +14,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,13 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
         btnSignUp = findViewById(R.id.BtnSignUp);
         btnLogin = findViewById(R.id.BtnLogin);
-        btnLogout = findViewById(R.id.BtnLogout);
-        mapView = findViewById(R.id.MapView);
+        //btnLogout = findViewById(R.id.BtnLogout);
+        //mapView = findViewById(R.id.MapView);
         Button moveToStepCounterButton = findViewById(R.id.moveToStepCounterButton);
 
-        nickname = findViewById(R.id.Nickname);
+        //nickname = findViewById(R.id.Nickname);
 
-        afterLogin = findViewById(R.id.AfterLogin);
+        //afterLogin = findViewById(R.id.AfterLogin);
         beforeLogin = findViewById(R.id.BeforeLogin);
         
         //걸음수 
@@ -70,84 +72,59 @@ public class MainActivity extends AppCompatActivity {
 
 
         //로그인
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnLogin.setOnClickListener(v -> {
+            View dialogView = View.inflate(MainActivity.this, R.layout.login_dialog, null);
+            AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
+            dlg.setView(dialogView);
+            AlertDialog dialog = dlg.create();
 
-                dialogView = View.inflate(MainActivity.this, R.layout.login_dialog, null);
+            Button loginComplete = dialogView.findViewById(R.id.LoginComplete);
+            EditText loginNickname = dialogView.findViewById(R.id.LoginNickname);
+            EditText loginPassword = dialogView.findViewById(R.id.LoginPassword);
+            TextView loginError = dialogView.findViewById(R.id.Error);
 
-                AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
-                dlg.setView(dialogView);
-                AlertDialog dialog = dlg.create();
+            loginComplete.setOnClickListener(view -> {
+                String nickname = loginNickname.getText().toString();
+                String password = loginPassword.getText().toString();
 
-                loginComplete = dialogView.findViewById(R.id.LoginComplete);
-                loginComplete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        loginNickname = dialogView.findViewById(R.id.LoginNickname);
-                        loginPassword = dialogView.findViewById(R.id.LoginPassword);
-                        loginError = dialogView.findViewById(R.id.Error);
+                Cursor cursor = sqLiteHelper.login(nickname, password);
 
-                        String nickname = loginNickname.getText().toString();
-                        String password = loginPassword.getText().toString();
+                if (cursor.moveToFirst()) { // 로그인 성공
+                    int idIndex = cursor.getColumnIndex(TableInfo.MemberEntry._ID);
+                    int id = cursor.getInt(idIndex);
 
-                        Cursor cursor = sqLiteHelper.login(nickname, password);
+                    SharedPreferences login = getSharedPreferences("login", Activity.MODE_PRIVATE);
+                    SharedPreferences.Editor loginEdit = login.edit();
+                    loginEdit.putInt("id", id);
+                    loginEdit.putString("nickname", nickname);
+                    loginEdit.apply();
 
-                        if(cursor.moveToFirst()) { //로그인 성공시 -> SharedPreferences에 로그인 정보 저장
-                            int idIndex = cursor.getColumnIndex(TableInfo.MemberEntry._ID);
-                            //int nicknameIndex = cursor.getColumnIndex(TableInfo.MemberEntry.COLUMN_NAME_NICKNAME);
-                            //int passwordIndex = cursor.getColumnIndex(TableInfo.MemberEntry.COLUMN_NAME_PASSWORD);
+                    cursor.close();
+                    dialog.dismiss();
+                    Toast.makeText(MainActivity.this, "로그인 성공", Toast.LENGTH_SHORT).show();
 
-                            int id = cursor.getInt(idIndex);
-                            //String dbNickname = cursor.getString(nicknameIndex); //로그인할 때 받는데 굳이 디비에서 가져온거?
-                            //String dbPassword = cursor.getString(passwordIndex);
+                    // MainScreen으로 이동
+                    Intent intent = new Intent(MainActivity.this, MainScreen.class);
+                    startActivity(intent);
+                    finish();
+                } else { // 로그인 실패
+                    loginError.setVisibility(View.VISIBLE);
+                }
+            });
 
-                            SharedPreferences login = getSharedPreferences("login", Activity.MODE_PRIVATE);
-                            SharedPreferences.Editor loginEdit = login.edit();
-                            loginEdit.putInt("id", id);
-                            loginEdit.putString("nickname", nickname);
-                            loginEdit.putString("password", password);
-                            loginEdit.commit();
-
-                            dialog.dismiss();
-                            afterLogin();
-                            Toast.makeText(MainActivity.this, "로그인 성공.", Toast.LENGTH_SHORT).show();
-
-                        }else { //로그인 실패 시 -> Error 메세지 visible
-                            loginError.setVisibility(View.VISIBLE);
-                        }
-                        cursor.close();
-                    }
-                });
-                dlg.setNegativeButton("취소", null);
-                dialog.show();
-            }
+            dlg.setNegativeButton("취소", null);
+            dialog.show();
         });
 
-        //로그아웃
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences login = getSharedPreferences("login", Activity.MODE_PRIVATE);
-                SharedPreferences.Editor loginEdit = login.edit();
-                loginEdit.clear();
-                loginEdit.commit();
-
-                afterLogin.setVisibility(View.GONE);
-                beforeLogin.setVisibility(View.VISIBLE);
-                Toast.makeText(MainActivity.this, "로그아웃 완료되었습니다.", Toast.LENGTH_SHORT).show();
-
-            }
-        });
 
         //지도 액티비티로 이동
-        mapView.setOnClickListener(new View.OnClickListener() {
+        /*mapView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, WalkingMap.class);
                 startActivity(intent);
             }
-        });
+        });*/
 //        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
 //            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -155,13 +132,15 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
-    private void afterLogin () {
+    /*private void afterLogin () {
         beforeLogin.setVisibility(View.GONE);
         afterLogin.setVisibility(View.VISIBLE);
 
         SharedPreferences login = getSharedPreferences("login", Activity.MODE_PRIVATE);
         String name = login.getString("nickname", null);
         nickname.setText(name + "님");
-    }
+    }*/
+
+
 
 }
