@@ -37,6 +37,6 @@
         </activity>
         <activity android:name=".StepCounterActivity" />
         <activity android:name=".EndofStepCounterActivity" />
-
+        <activity android:name=".MainScreen" />
     </application>
 </manifest>
