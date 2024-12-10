@@ -2,14 +2,18 @@ package com.example.mobile_term_project;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.kakao.vectormap.KakaoMap;
 import com.kakao.vectormap.KakaoMapReadyCallback;
@@ -17,13 +21,11 @@ import com.kakao.vectormap.KakaoMapSdk;
 import com.kakao.vectormap.LatLng;
 import com.kakao.vectormap.MapLifeCycleCallback;
 import com.kakao.vectormap.MapView;
-import com.kakao.vectormap.MapViewInfo;
 import com.kakao.vectormap.label.Label;
 import com.kakao.vectormap.label.LabelLayer;
 import com.kakao.vectormap.label.LabelOptions;
 import com.kakao.vectormap.label.LabelStyle;
 import com.kakao.vectormap.label.LabelStyles;
-import com.kakao.vectormap.label.PathOptions;
 import com.kakao.vectormap.label.TrackingManager;
 import com.kakao.vectormap.route.RouteLine;
 import com.kakao.vectormap.route.RouteLineLayer;
@@ -34,16 +36,13 @@ import com.kakao.vectormap.route.RouteLineStyles;
 import com.kakao.vectormap.route.RouteLineStylesSet;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class WalkingMap extends AppCompatActivity {
 
     MapView mapView;
     KakaoMap kakaoMap;
-
-    //GPS 구현 전 임시로
-    EditText coordinate;
-    Button btn;
+    LocationManager locationManager;
+    LocationListener locationListener;
 
     ArrayList<LatLng> routePath = new ArrayList<>();
 
@@ -51,6 +50,23 @@ public class WalkingMap extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_walking_map);
+
+        mapView = findViewById(R.id.map_view);
+        //locationManager 초기화
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        //locationListener 초기화
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                double lat = location.getLatitude();
+                double lng = location.getLongitude();
+
+                routePath.add(LatLng.from(lat,lng));
+                Log.d("location", "업데이트 된 위치: 위도: " + lat + ", 경도: " + lng);
+                updateRoutePath(routePath);
+            }
+        };
 
         //kakaoMapSDK 초기화
         try {
@@ -60,10 +76,22 @@ public class WalkingMap extends AppCompatActivity {
             Log.e(TAG, "Kakao Map SDK 초기화 실패: " + e.getMessage(), e);
         }
 
-        mapView = findViewById(R.id.map_view);
-        coordinate = findViewById(R.id.Coordinate);
-        btn = findViewById(R.id.Btn);
 
+        //권한 확인 및 사용자에게 권한 요청
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+            //return;
+        }else {
+            locationManager.requestLocationUpdates(
+                    locationManager.GPS_PROVIDER, 3000,-1,locationListener
+            );
+        }
+
+
+        //kakao map
         mapView.start(new MapLifeCycleCallback() {
             @Override
             public void onMapDestroy() {
@@ -87,9 +115,44 @@ public class WalkingMap extends AppCompatActivity {
             public void onMapReady(KakaoMap map) {
                 // 인증 후 API가 정상적으로 실행될 때 호출됨
                 kakaoMap = map;
-                routePath.add(LatLng.from(37.401750, 127.109656));
-                routePath.add(LatLng.from(37.396374, 127.109653)); //잘 보이게 하려고 일단 기본으로 넣어둠
-                drawRoutePath(routePath);
+
+                if (ActivityCompat.checkSelfPermission(WalkingMap.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    /*Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                    if (lastKnownLocation != null) {
+                        LatLng initialPoint = LatLng.from(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+
+                        routePath.add(initialPoint);
+                        Log.d("location", "위도 : " + initialPoint.getLatitude() + ", 경도 : " + initialPoint.getLongitude());
+
+
+                        drawRoutePath(routePath);
+                    } else {
+                        Log.e(TAG, "최초 위치 정보를 가져오지 못했습니다.");
+                    }*/
+
+                    // 최신 위치 가져오기
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                        locationManager.getCurrentLocation(LocationManager.NETWORK_PROVIDER, null, getMainExecutor(), location -> {
+                            if (location != null) {
+                                setInitialRoute(location);
+                            } else {
+                                Log.e(TAG, "현재 위치를 네트워크로 가져올 수 없습니다!");
+                            }
+                        });
+                    } else {
+                        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, location -> {
+                            if (location != null) {
+                                setInitialRoute(location);
+                            } else {
+                                Log.e(TAG, "현재 위치를 가져올 수 없습니다.");
+                            }
+                        }, null);
+                    }
+
+                } else {
+                    Log.e(TAG, "위치 권한이 없습니다.");
+                }
             }
 
 
@@ -108,31 +171,36 @@ public class WalkingMap extends AppCompatActivity {
         }
         );
 
-        //GPS 구현 전 RouteLine 변경 테스트를 위해서 사용
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String text = coordinate.getText().toString().trim();
-
-                String[] tmp = text.split(",\\s*");
-                if(tmp.length == 2) {
-                    double latitude = Double.parseDouble(tmp[0]);
-                    double longitude = Double.parseDouble(tmp[1]);
-
-                    routePath.add(LatLng.from(latitude,longitude));
-                    updateRoutePath(routePath);
-
-                    coordinate.setText(null);
-
-                } else {
-                    Log.d("EditTextInput", "input error");
-                }
-            }
-        });
-
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == 100){
+
+            // 허용하지 않았으면, 다시 허용하라는 알러트 띄운다.
+            if(ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+                finish();
+                return;
+            }
+
+            // 허용했으면, GPS 정보 가져오는 코드 넣는다.
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    1000, -1,
+                    locationListener
+            );
+
+        }
+    }
+
+
+        @Override
     public void onResume() {
         super.onResume();
         //mapView.resume();     // MapView 의 resume 호출
@@ -205,6 +273,20 @@ public class WalkingMap extends AppCompatActivity {
 
         TrackingManager trackingManager = kakaoMap.getTrackingManager();
         trackingManager.startTracking(label);
+    }
+
+    private void setInitialRoute(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        LatLng initialPoint = LatLng.from(latitude, longitude);
+        routePath.add(initialPoint);
+
+        //routeLine 그리기 위해서 두번째 점 추가
+        routePath.add(LatLng.from(latitude + 0.00001, longitude + 0.00001));
+
+        drawRoutePath(routePath);
+        Log.d("location", "초기 위치: 위도: " + latitude + ", 경도: " + longitude);
     }
 
 
