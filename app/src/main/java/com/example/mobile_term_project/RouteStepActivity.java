@@ -88,14 +88,6 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             }
         };
 
-        //kakaoMapSDK 초기화
-        try {
-            KakaoMapSdk.init(this, BuildConfig.KAKAO_MAP_KEY);
-            Log.d(TAG, "Kakao Map SDK 초기화 성공");
-        } catch (Exception e) {
-            Log.e(TAG, "Kakao Map SDK 초기화 실패: " + e.getMessage(), e);
-        }
-
         //gps, sensor 권한 확인 및 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10 이상에서 권한 확인
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -109,76 +101,24 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                         100);
             } else {
                 locationManager.requestLocationUpdates(
-                        locationManager.GPS_PROVIDER, 1000,-1,locationListener
-                );
+                        locationManager.GPS_PROVIDER, 1000,-1,locationListener);
                 initializeSensor();
+                initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
             }
         } else {
             locationManager.requestLocationUpdates(
-                    locationManager.GPS_PROVIDER, 1000,-1,locationListener
-            );
+                    locationManager.GPS_PROVIDER, 1000,-1,locationListener);
             initializeSensor();
+            initializeMapView(); // 권한이 이미 허용된 경우 지도 초기화
         }
 
-        //kakao map
-        mapView.start(new MapLifeCycleCallback() {
-                          @Override
-                          public void onMapDestroy() {
-                              // 지도 API 가 정상적으로 종료될 때 호출됨
-                              Log.d("MapLifeCycle", "Map is destroyed");
-
-                          }
-
-                          @Override
-                          public void onMapError(Exception e) {
-                              // 인증 실패 및 지도 사용 중 에러가 발생할 때 호출됨
-                              Log.e("MapLifeCycle", "Map error occurred: " + e.getMessage(), e);
-                          }
-                      },
-
-                new KakaoMapReadyCallback() {
-                    @Override
-                    public void onMapReady(KakaoMap map) {
-                        // 인증 후 API가 정상적으로 실행될 때 호출됨
-                        kakaoMap = map;
-
-                        if (ActivityCompat.checkSelfPermission(RouteStepActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                            //최신 위치 가져오기
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                                locationManager.getCurrentLocation(LocationManager.NETWORK_PROVIDER, null, getMainExecutor(), location -> {
-                                    if (location != null) {
-                                        setInitialRoute(location);
-                                    } else {
-                                        Log.e(TAG, "현재 위치를 네트워크로 가져올 수 없습니다!");
-                                    }
-                                });
-                            } else {
-                                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, location -> {
-                                    if (location != null) {
-                                        setInitialRoute(location);
-                                    } else {
-                                        Log.e(TAG, "현재 위치를 가져올 수 없습니다.");
-                                    }
-                                }, null);
-                            }
-                        } else {
-                            Log.e(TAG, "위치 권한이 없습니다.");
-                        }
-                    }
-
-
-                    @Override
-                    public int getZoomLevel() {
-                        // 지도 시작 시 확대/축소 줌 레벨 설정
-                        return 15;
-                    }
-
-                    @Override
-                    public boolean isVisible() {
-                        // 지도 시작 시 visible 여부를 설정
-                        return true;
-                    }
-                });
+        //kakaoMapSDK 초기화
+        try {
+            KakaoMapSdk.init(this, BuildConfig.KAKAO_MAP_KEY);
+            Log.d(TAG, "Kakao Map SDK 초기화 성공");
+        } catch (Exception e) {
+            Log.e(TAG, "Kakao Map SDK 초기화 실패: " + e.getMessage(), e);
+        }
 
         // 종료하기 버튼 클릭 이벤트
         stopButton.setOnClickListener(new View.OnClickListener() {
@@ -198,39 +138,6 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
         });
     }
 
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if(requestCode == 100){
-            //허용하지 않았으면, 다시 허용하라는 알러트
-            if(ActivityCompat.checkSelfPermission(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                finish();
-                return;
-            }
-            //허용했으면, GPS 정보 가져오는 코드
-            locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    1000, -1,
-                    locationListener
-            );
-        }
-    }*/
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "권한 허용됨", Toast.LENGTH_SHORT).show();
-                initializeSensor();
-            } else {
-                Toast.makeText(this, "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -252,9 +159,9 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                 // 위치 권한이 허용된 경우
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, 1000, -1, locationListener
-                    );
+                            LocationManager.GPS_PROVIDER, 1000, -1, locationListener);
                     Toast.makeText(this, "위치 권한 허용", Toast.LENGTH_SHORT).show();
+                    initializeMapView();
                 }
             } else {
                 Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
@@ -326,6 +233,69 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.d("StepCounterActivity", "Sensor accuracy changed: " + accuracy);
+    }
+
+    private void initializeMapView() {
+        //kakao map
+        mapView.start(new MapLifeCycleCallback() {
+                          @Override
+                          public void onMapDestroy() {
+                              // 지도 API 가 정상적으로 종료될 때 호출됨
+                              Log.d("MapLifeCycle", "Map is destroyed");
+
+                          }
+
+                          @Override
+                          public void onMapError(Exception e) {
+                              // 인증 실패 및 지도 사용 중 에러가 발생할 때 호출됨
+                              Log.e("MapLifeCycle", "Map error occurred: " + e.getMessage(), e);
+                          }
+                      },
+
+                new KakaoMapReadyCallback() {
+                    @Override
+                    public void onMapReady(KakaoMap map) {
+                        // 인증 후 API가 정상적으로 실행될 때 호출됨
+                        kakaoMap = map;
+
+                        if (ActivityCompat.checkSelfPermission(RouteStepActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            //최신 위치 가져오기
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                                locationManager.getCurrentLocation(LocationManager.NETWORK_PROVIDER, null, getMainExecutor(), location -> {
+                                    if (location != null) {
+                                        setInitialRoute(location);
+                                    } else {
+                                        Log.e(TAG, "현재 위치를 네트워크로 가져올 수 없습니다!");
+                                    }
+                                });
+                            } else {
+                                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, location -> {
+                                    if (location != null) {
+                                        setInitialRoute(location);
+                                    } else {
+                                        Log.e(TAG, "현재 위치를 가져올 수 없습니다.");
+                                    }
+                                }, null);
+                            }
+                        } else {
+                            Log.e(TAG, "위치 권한이 없습니다.");
+                        }
+                    }
+
+
+                    @Override
+                    public int getZoomLevel() {
+                        // 지도 시작 시 확대/축소 줌 레벨 설정
+                        return 15;
+                    }
+
+                    @Override
+                    public boolean isVisible() {
+                        // 지도 시작 시 visible 여부를 설정
+                        return true;
+                    }
+                });
+
     }
 
 
@@ -408,8 +378,4 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             Log.d("StepCounterActivity", "Step Counter 센서 초기화 완료");
         }
     }
-
-
-
-
 }
