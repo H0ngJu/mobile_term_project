@@ -2,30 +2,33 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.mobile_term_project" >
+
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- 인터넷 사용 권한 설정 -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- 위치 권한 설정 -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mobile_term_project"
-        tools:targetApi="31"
-        android:hardwareAccelerated="true">
+        tools:targetApi="31" >
+        <activity
+            android:name=".RouteStepActivity"
+            android:exported="false" />
         <activity
             android:name=".WalkingMap"
             android:exported="false" />
         <activity
-            android:name=".SignUp"
+            android:name=".SignUpActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -40,4 +43,5 @@
         <activity android:name=".EndofStepCounterActivity" />
         <activity android:name=".MainScreen" />
     </application>
+
 </manifest>

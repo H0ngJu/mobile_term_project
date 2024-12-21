@@ -69,7 +69,7 @@ public class MainScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 측정 화면으로 이동
-                Intent intent = new Intent(MainScreen.this, StepCounterActivity.class);
+                Intent intent = new Intent(MainScreen.this, RouteStepActivity.class);
                 startActivity(intent);
             }
         });
