@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.example.mobile_term_project.db.SQLiteHelper;
 
-public class SignUp extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
     EditText nickname, password, checkPassword;
     TextView errorPwd;
@@ -45,16 +45,16 @@ public class SignUp extends AppCompatActivity {
             public void onClick(View v) {
                 String input = nickname.getText().toString();
                 if(input.isEmpty()) {
-                    Toast.makeText(SignUp.this, "닉네임을 입력하세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "닉네임을 입력하세요.", Toast.LENGTH_SHORT).show();
                     checkDup = false;
                 }
                 else {
                     if(!sqLiteHelper.checkNickname(input)) {
-                        Toast.makeText(SignUp.this, "사용가능한 닉네임입니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUpActivity.this, "사용가능한 닉네임입니다.", Toast.LENGTH_SHORT).show();
                         checkDup = true;
                     }
                     else {
-                        Toast.makeText(SignUp.this, "이미 존재하는 닉네임입니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUpActivity.this, "이미 존재하는 닉네임입니다.", Toast.LENGTH_SHORT).show();
                         checkDup = false;
                     }
                 }
@@ -102,16 +102,16 @@ public class SignUp extends AppCompatActivity {
                 String inputNickname = nickname.getText().toString();
                 String inputPassword = password.getText().toString();
                 if(checkDup == false) {
-                    Toast.makeText(SignUp.this, "닉네임 '중복확인'버튼을 클릭해주세요. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "닉네임 '중복확인'버튼을 클릭해주세요. ", Toast.LENGTH_SHORT).show();
                 } else if(checkPwd == false) {
-                    Toast.makeText(SignUp.this, "비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     if(sqLiteHelper.addMember(inputNickname, inputPassword) == -1) {
-                        Toast.makeText(SignUp.this, "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUpActivity.this, "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(SignUp.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SignUp.this, MainActivity.class);
+                        Toast.makeText(SignUpActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                         startActivity(intent);
                     }
                 }

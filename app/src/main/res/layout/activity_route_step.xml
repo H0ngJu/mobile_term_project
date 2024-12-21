@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+  <com.kakao.vectormap.MapView
+      android:id="@+id/map_view"
+      android:layout_width="match_parent"
+      android:layout_height="500sp" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      android:background="#FFFFFF">
+
+    <TextView
+        android:id="@+id/stepCountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="걸음 수 : "
+        android:textSize="30sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/DistanceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이동 거리 : "
+        android:textSize="30sp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="종료하기" />
+
+
+  </LinearLayout>
+
+  </LinearLayout>
