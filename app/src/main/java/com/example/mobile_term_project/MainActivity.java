@@ -21,7 +21,6 @@ import com.example.mobile_term_project.db.TableInfo;
 public class MainActivity extends AppCompatActivity {
 
     SQLiteHelper sqLiteHelper;
-    SharedPreferences sharedPreferences;
     Button btnSignUp, btnLogin;
 
     LinearLayout beforeLogin;
@@ -33,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
         //db
         sqLiteHelper = new SQLiteHelper(this);
-        //로그인 유지
-        sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
 
         btnSignUp = findViewById(R.id.BtnSignUp);
         btnLogin = findViewById(R.id.BtnLogin);

@@ -27,7 +27,7 @@
         android:id="@+id/DistanceText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="이동 거리 : "
+        android:text="이동 거리 : 0 M"
         android:textSize="30sp"
         android:gravity="center" />
 
