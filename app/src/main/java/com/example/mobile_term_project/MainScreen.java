@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.mobile_term_project.db.SQLiteHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -35,17 +37,12 @@ public class MainScreen extends AppCompatActivity {
         // RecyclerView
         recordRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        List<Record> dummyData = new ArrayList<>(); // 더미 데이터
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-        dummyData.add(new Record("09:30 AM", "5.2 km", "6000 걸음", R.drawable.sample));
-
-        RecordAdapter adapter = new RecordAdapter(dummyData);
+        SQLiteHelper sqLiteHelper = new SQLiteHelper(this);
+        int memberId = login.getInt("id", 0);
+        //데이터 조회
+        List<Record> records = sqLiteHelper.getRecordsByMemberId(memberId);
+        //어댑터에 데이터 연결
+        RecordAdapter adapter = new RecordAdapter(records);
         recordRecyclerView.setAdapter(adapter);
 
         // 로그아웃 버튼 클릭 이벤트

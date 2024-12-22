@@ -1,21 +1,26 @@
 package com.example.mobile_term_project;
 
-public class Record {
-    String time;
-    String distance;
-    String steps;
-    int imageResId;
+import android.graphics.Bitmap;
 
-    public Record(String time, String distance, String steps, int imageResId) {
-        this.time = time;
+public class Record {
+    String startTime;
+    String endTime;
+    String distance;
+    int steps;
+    Bitmap image;
+
+    public Record(String start, String end, String distance, int steps, Bitmap image) {
+        this.startTime = start;
+        this.endTime = end;
         this.distance = distance;
         this.steps = steps;
-        this.imageResId = imageResId;
+        this.image = image;
     }
 
-    public String getTime() { return time; }
-    public String getDistance() { return distance; }
-    public String getSteps() { return steps; }
-    public int getImageResId() { return imageResId; }
+    public String getStartTime() {return startTime;}
+    public String getEndTime() {return endTime;}
+    public String getDistance() {return distance;}
+    public int getSteps() {return steps;}
+    public Bitmap getImage() {return image;}
 }
 

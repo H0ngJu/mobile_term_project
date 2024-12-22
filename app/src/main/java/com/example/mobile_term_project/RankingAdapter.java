@@ -40,10 +40,12 @@ public class RankingAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.ranking_item, parent, false);
         }
 
+        TextView rankTextView = convertView.findViewById(R.id.rankNum);
         TextView nameTextView = convertView.findViewById(R.id.nameTextView);
         TextView stepsTextView = convertView.findViewById(R.id.stepsTextView);
 
         RankingItemModel item = rankingList.get(position);
+        rankTextView.setText(String.valueOf(position+1));
         nameTextView.setText(item.getName());
         stepsTextView.setText(String.valueOf(item.getSteps()));
 
