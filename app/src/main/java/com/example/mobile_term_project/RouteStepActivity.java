@@ -123,12 +123,10 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                         100);
             } else {
                 initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
-                locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 3000,1,locationListener);
                 initializeSensor();
             }
         } else {
             initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
-            locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 3000,1,locationListener);
             initializeSensor();
         }
 
@@ -180,7 +178,6 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                 // 위치 권한이 허용된 경우
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     initializeMapView();
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
                     Toast.makeText(this, "위치 권한 허용", Toast.LENGTH_SHORT).show();
                 }
             } else {
@@ -214,9 +211,8 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             return;
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
-            Log.d("location", "LocationListener 재등록 완료");
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
+            Log.d("location", "LocationListener 재 등록 완료");
         } else {
             Log.e("location", "위치 권한이 없습니다.");
         }
@@ -308,6 +304,7 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                                     }
                                 }, null);
                             }
+                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
                         } else {
                             Log.e(TAG, "위치 권한이 없습니다.");
                         }
