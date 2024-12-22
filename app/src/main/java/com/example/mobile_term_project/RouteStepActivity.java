@@ -5,11 +5,15 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,6 +30,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mobile_term_project.db.SQLiteHelper;
 import com.kakao.vectormap.KakaoMap;
 import com.kakao.vectormap.KakaoMapReadyCallback;
 import com.kakao.vectormap.KakaoMapSdk;
@@ -50,6 +55,7 @@ import java.util.ArrayList;
 
 public class RouteStepActivity extends AppCompatActivity implements SensorEventListener {
 
+    SQLiteHelper sqLiteHelper;
     MapView mapView;
     KakaoMap kakaoMap;
     LocationManager locationManager;
@@ -57,35 +63,51 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
 
-    private TextView stepCountText;
+    private TextView stepCountText, distanceText;
     private Button stopButton;
+
+    private StepDataViewModel stepDataViewModel;
 
     ArrayList<LatLng> routePath = new ArrayList<>();
     private int stepCount = 0;
+    private double totalDistance = 0.0; //미터 단위
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_step);
 
+        sqLiteHelper = new SQLiteHelper(this);
+
         mapView = findViewById(R.id.map_view);
         stepCountText = findViewById(R.id.stepCountText);
+        distanceText = findViewById(R.id.DistanceText);
         stopButton = findViewById(R.id.stopButton);
+
+        stepDataViewModel = new ViewModelProvider(this).get(StepDataViewModel.class);
 
         //locationManager 초기화
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        //locationListener 초기화
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                double lat = location.getLatitude();
-                double lng = location.getLongitude();
+        //kakaoMapSDK 초기화
+        try {
+            KakaoMapSdk.init(this, BuildConfig.KAKAO_MAP_KEY);
+            Log.d(TAG, "Kakao Map SDK 초기화 성공");
+        } catch (Exception e) {
+            Log.e(TAG, "Kakao Map SDK 초기화 실패: " + e.getMessage(), e);
+        }
 
-                routePath.add(LatLng.from(lat,lng));
-                Log.d("location", "업데이트 된 위치: 위도: " + lat + ", 경도: " + lng);
-                updateRoutePath(routePath);
-            }
+        //locationListener 초기화
+        locationListener = location -> {
+            double lat = location.getLatitude();
+            double lng = location.getLongitude();
+
+            Log.d("location", "업데이트 된 위치: 위도: " + lat + ", 경도: " + lng);
+            routePath.add(LatLng.from(lat,lng));
+            updateRoutePath(routePath);
+
+            String formatDistance = calculateDistance();
+            distanceText.setText("이동 거리 : " + formatDistance);
         };
 
         //gps, sensor 권한 확인 및 요청
@@ -100,32 +122,25 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                                 android.Manifest.permission.ACTIVITY_RECOGNITION},
                         100);
             } else {
-                locationManager.requestLocationUpdates(
-                        locationManager.GPS_PROVIDER, 1000,-1,locationListener);
-                initializeSensor();
                 initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
+                locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 3000,1,locationListener);
+                initializeSensor();
             }
         } else {
-            locationManager.requestLocationUpdates(
-                    locationManager.GPS_PROVIDER, 1000,-1,locationListener);
+            initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
+            locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 3000,1,locationListener);
             initializeSensor();
-            initializeMapView(); // 권한이 이미 허용된 경우 지도 초기화
         }
 
-        //kakaoMapSDK 초기화
-        try {
-            KakaoMapSdk.init(this, BuildConfig.KAKAO_MAP_KEY);
-            Log.d(TAG, "Kakao Map SDK 초기화 성공");
-        } catch (Exception e) {
-            Log.e(TAG, "Kakao Map SDK 초기화 실패: " + e.getMessage(), e);
-        }
-
-        // 종료하기 버튼 클릭 이벤트
+        //종료하기 버튼 클릭 이벤트
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 걸음 수 저장
-                StepDataStoreModel.setStepCount(stepCount);
+                //걸음 수 저장
+                Bitmap bitmap = captureView(mapView);
+                stepDataViewModel.saveStepData(stepCount, totalDistance, bitmap);
+                sqLiteHelper.addStepData();
+
                 Toast.makeText(RouteStepActivity.this, "걸음 수 저장 완료: " + stepCount, Toast.LENGTH_SHORT).show();
 
                 // 다음 Activity로 이동
@@ -136,6 +151,12 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                 finish();
             }
         });
+    }
+    private Bitmap captureView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
     }
 
     @Override
@@ -158,10 +179,9 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             if (locationPermissionGranted) {
                 // 위치 권한이 허용된 경우
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, 1000, -1, locationListener);
-                    Toast.makeText(this, "위치 권한 허용", Toast.LENGTH_SHORT).show();
                     initializeMapView();
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
+                    Toast.makeText(this, "위치 권한 허용", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
@@ -193,6 +213,13 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             Log.e("StepCounterActivity", "SensorManager is NULL");
             return;
         }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
+            Log.d("location", "LocationListener 재등록 완료");
+        } else {
+            Log.e("location", "위치 권한이 없습니다.");
+        }
 
         if (stepCounterSensor != null) {
             boolean isRegistered = sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI);
@@ -209,7 +236,7 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
     @Override
     public void onPause() {
         super.onPause();
-        //mapView.pause();    // MapView 의 pause 호출
+
         if (mapView != null) {
             mapView.pause(); // MapView의 pause 호출
         } else {
@@ -218,6 +245,10 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
 
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
+        }
+
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
         }
     }
 
@@ -269,7 +300,7 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                                     }
                                 });
                             } else {
-                                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, location -> {
+                                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, location -> {
                                     if (location != null) {
                                         setInitialRoute(location);
                                     } else {
@@ -281,7 +312,6 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                             Log.e(TAG, "위치 권한이 없습니다.");
                         }
                     }
-
 
                     @Override
                     public int getZoomLevel() {
@@ -295,24 +325,40 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                         return true;
                     }
                 });
-
     }
 
+    private void setInitialRoute(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
 
-    public void drawRoutePath(ArrayList<LatLng> startPoint) {
+        LatLng initialPoint = LatLng.from(latitude, longitude);
+        routePath.add(initialPoint);
+
+        //routeLine 그리기 위해서 두번째 점 추가
+        routePath.add(LatLng.from(latitude + 0.00001, longitude + 0.00001));
+
+        //routeLine 그리기
         RouteLineLayer layer = kakaoMap.getRouteLineManager().getLayer(); //디폴트로 생성된 layer를 가져옴
 
         RouteLineStylesSet stylesSet = RouteLineStylesSet.from("defaultStyle",
                 RouteLineStyles.from(RouteLineStyle.from(16, Color.RED))); //모든 줌레벨, 라인두께 16px, 파란색 스타일
 
-        RouteLineSegment segment = RouteLineSegment.from(startPoint)
+        RouteLineSegment segment = RouteLineSegment.from(routePath)
                 .setStyles(stylesSet.getStyles(0));
 
         RouteLineOptions options = RouteLineOptions.from("default",segment).setStylesSet(stylesSet);
         RouteLine routeLine = layer.addRouteLine(options);
         routeLine.show();
 
-        setUpLabel(startPoint.get(startPoint.size()-1));
+        setUpLabel(routePath.get(routePath.size()-1));
+
+        Log.d("location", "초기 위치: 위도: " + latitude + ", 경도: " + longitude);
+
+        SharedPreferences login = getSharedPreferences("login", MODE_PRIVATE);
+        int memberId = login.getInt("id", 0);
+
+        stepDataViewModel.initialStepData(); //초기화
+        stepDataViewModel.startStepData(memberId); //저장 시작
     }
 
     public void updateRoutePath(ArrayList<LatLng> newPath) {
@@ -350,21 +396,17 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
         trackingManager.startTracking(label);
     }
 
-    private void setInitialRoute(Location location) {
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
+    public String calculateDistance (){ //두 좌표간의 거리 구하기
+        LatLng point1 = routePath.get(routePath.size()-2);
+        LatLng point2 = routePath.get(routePath.size()-1);
 
-        LatLng initialPoint = LatLng.from(latitude, longitude);
-        routePath.add(initialPoint);
+        float[] distance = new float[1];
+        Location.distanceBetween(point1.getLatitude(), point1.getLongitude(), point2.getLatitude(), point2.getLongitude(), distance);
 
-        //routeLine 그리기 위해서 두번째 점 추가
-        routePath.add(LatLng.from(latitude + 0.00001, longitude + 0.00001));
-
-        drawRoutePath(routePath);
-        Log.d("location", "초기 위치: 위도: " + latitude + ", 경도: " + longitude);
+        totalDistance += distance[0];
+        return stepDataViewModel.formatDistance(totalDistance);
     }
 
-    // 센서 초기화 메서드
     private void initializeSensor() {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {

@@ -8,11 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import com.example.mobile_term_project.StepDataStoreModel;
 import com.example.mobile_term_project.db.TableInfo;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "MobileProgramming.db";
 
     public static final String MEMBER_SQL_CREATE_ENTRIES =
@@ -26,7 +27,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public static final String STEPS_SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TableInfo.StepRecordEntry.TABLE_NAME + " (" +
                     TableInfo.StepRecordEntry._ID + " INTEGER PRIMARY KEY," +
-                    TableInfo.StepRecordEntry.COLUMN_NAME_COUNT + " TEXT," +
+                    TableInfo.StepRecordEntry.COLUMN_NAME_COUNT + " INTEGER," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE + " TEXT," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_START_TIME + " TEXT," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME + " TEXT," +
@@ -95,6 +96,22 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    //db에 걸음 수 데이터 추가
+    public void addStepData () {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID, StepDataStoreModel.getMemberId());
+        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_COUNT, StepDataStoreModel.getStepCount());
+        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE, StepDataStoreModel.getDistance());
+        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_START_TIME, StepDataStoreModel.getStartTime());
+        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME,StepDataStoreModel.getEndTime());
+        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_IMAGE, StepDataStoreModel.getMapImage());
+
+        db.insert(TableInfo.StepRecordEntry.TABLE_NAME, null, values);
+        db.close();
+    }
+
     //로그인
     public Cursor login (String nickname, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -104,6 +121,4 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         return db.rawQuery(query, new String[]{nickname, password});
     }
-
-
 }

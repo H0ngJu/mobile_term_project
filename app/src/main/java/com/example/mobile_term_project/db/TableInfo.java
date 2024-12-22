@@ -15,7 +15,7 @@ public class TableInfo {
 
     public static class StepRecordEntry implements BaseColumns {
         public static final String TABLE_NAME = "step_record";
-        public static final String COLUMN_NAME_MEMBER_ID = "member_id"; //BaseColums의 default로 생선된 member 테이블의 id는  _id 형태의 도메인임;;;
+        public static final String COLUMN_NAME_MEMBER_ID = "member_id"; //BaseColums의 default로 생선된 member 테이블의 id는  _id 형태의 도메인임
         public static final String COLUMN_NAME_COUNT = "count";
         public static final String COLUMN_NAME_DISTANCE = "distance";
 
