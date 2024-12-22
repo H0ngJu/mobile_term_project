@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 
 import androidx.annotation.Nullable;
 
+import com.example.mobile_term_project.RankingItemModel;
 import com.example.mobile_term_project.Record;
 import com.example.mobile_term_project.StepDataStoreModel;
 import com.example.mobile_term_project.db.TableInfo;
@@ -178,4 +179,36 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
         return records;
     }
+
+    //랭킹에 쓸 데이터
+    public List<RankingItemModel> getAllUsersTopSteps() {
+        List<RankingItemModel> rankingList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT " +
+                TableInfo.MemberEntry.TABLE_NAME + "." + TableInfo.MemberEntry.COLUMN_NAME_NICKNAME + " AS nickname, " +
+                "MAX(" + TableInfo.StepRecordEntry.TABLE_NAME + "." + TableInfo.StepRecordEntry.COLUMN_NAME_COUNT + ") AS max_steps " +
+                "FROM " + TableInfo.StepRecordEntry.TABLE_NAME +
+                " INNER JOIN " + TableInfo.MemberEntry.TABLE_NAME +
+                " ON " + TableInfo.StepRecordEntry.TABLE_NAME + "." + TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID + " = " +
+                TableInfo.MemberEntry.TABLE_NAME + "." + TableInfo.MemberEntry._ID +
+                " GROUP BY " + TableInfo.StepRecordEntry.TABLE_NAME + "." + TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID +
+                " ORDER BY max_steps DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String nickname = cursor.getString(cursor.getColumnIndexOrThrow("nickname"));
+                int maxSteps = cursor.getInt(cursor.getColumnIndexOrThrow("max_steps"));
+
+                rankingList.add(new RankingItemModel(nickname, maxSteps));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        db.close();
+        return rankingList;
+    }
+
 }

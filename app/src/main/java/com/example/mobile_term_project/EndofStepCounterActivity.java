@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mobile_term_project.db.SQLiteHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,7 +16,6 @@ public class EndofStepCounterActivity extends AppCompatActivity {
 
     private TextView stepCountTextView;
     private ListView rankingListView;
-    private ArrayList<RankingItemModel> rankingList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +29,9 @@ public class EndofStepCounterActivity extends AppCompatActivity {
         int savedSteps = StepDataStoreModel.getStepCount();
         stepCountTextView.setText("내 걸음 수: " + savedSteps);
 
-        // 더미 데이터 추가
-        rankingList = new ArrayList<>();
-        rankingList.add(new RankingItemModel("김민아", 1500));
-        rankingList.add(new RankingItemModel("이홍주", 1200));
-        rankingList.add(new RankingItemModel("윤성원", 800));
-        rankingList.add(new RankingItemModel("김영봉", 500));
+        SQLiteHelper dbHelper = new SQLiteHelper(this);
+        ArrayList<RankingItemModel> rankingList = new ArrayList<>(dbHelper.getAllUsersTopSteps());
 
-        // 현재 사용자 데이터 추가
-        rankingList.add(new RankingItemModel("You", savedSteps));
 
         // 걸음 수에 따라 정렬
         Collections.sort(rankingList, new Comparator<RankingItemModel>() {
