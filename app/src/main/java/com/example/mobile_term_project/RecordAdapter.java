@@ -89,10 +89,10 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
             if (startDateStr.equals(endDateStr)) {
                 // 날짜가 같은 경우
-                return startDateStr + " " + startTimeStr + " ~ " + endTimeStr;
+                return startDateStr + "\n" + startTimeStr + " ~ " + endTimeStr;
             } else {
                 // 날짜가 다른 경우
-                return startDateStr + " " + startTimeStr + " ~ " + endDateStr + " " + endTimeStr;
+                return startDateStr + "\n" + startTimeStr + " ~ " + endDateStr + "\n" + endTimeStr;
             }
         } catch (Exception e) {
             e.printStackTrace();

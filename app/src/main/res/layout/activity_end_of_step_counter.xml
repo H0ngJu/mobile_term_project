@@ -18,7 +18,15 @@
     <ListView
         android:id="@+id/rankingListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp" />
+
+    <Button
+        android:id="@+id/backToMainButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="마이페이지로 돌아가기"
+        android:layout_marginTop="16dp" />
 </LinearLayout>

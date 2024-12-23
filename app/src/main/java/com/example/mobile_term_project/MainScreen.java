@@ -26,8 +26,9 @@ public class MainScreen extends AppCompatActivity {
 
         TextView nicknameView = findViewById(R.id.nicknameTextView);
         RecyclerView recordRecyclerView = findViewById(R.id.recordRecyclerView);
-        Button logoutButton = findViewById(R.id.logoutButton);
-        Button stepButton = findViewById(R.id.stepButton);
+        View logoutLayout = findViewById(R.id.logoutLayout);
+        View stepLayout = findViewById(R.id.stepLayout);
+        View rankingLayout = findViewById(R.id.rankingLayout);
 
         // 닉네임 가져옴
         SharedPreferences login = getSharedPreferences("login", MODE_PRIVATE);
@@ -45,8 +46,8 @@ public class MainScreen extends AppCompatActivity {
         RecordAdapter adapter = new RecordAdapter(records);
         recordRecyclerView.setAdapter(adapter);
 
-        // 로그아웃 버튼 클릭 이벤트
-        logoutButton.setOnClickListener(new View.OnClickListener() {
+        // 로그아웃 클릭 이벤트
+        logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // SharedPreferences 로그아웃 처리
@@ -62,11 +63,22 @@ public class MainScreen extends AppCompatActivity {
             }
         });
 
-        stepButton.setOnClickListener(new View.OnClickListener() {
+        // 측정하기 클릭 이벤트
+        stepLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // 측정 화면으로 이동
                 Intent intent = new Intent(MainScreen.this, RouteStepActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // 랭킹 보기 클릭 이벤트
+        rankingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 랭킹 화면으로 이동
+                Intent intent = new Intent(MainScreen.this, EndofStepCounterActivity.class);
                 startActivity(intent);
             }
         });
