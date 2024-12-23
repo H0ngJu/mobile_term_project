@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "MobileProgramming.db";
 
     public static final String MEMBER_SQL_CREATE_ENTRIES =
@@ -38,7 +38,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE + " TEXT," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_START_TIME + " TEXT," +
                     TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME + " TEXT," +
-                    TableInfo.StepRecordEntry.COLUMN_NAME_IMAGE + " BLOB," + //이미지파일 데이터를 BLOB로 저장
                     TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID + " INTEGER," +
                     "FOREIGN KEY(" + TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID + ") REFERENCES " +
                     TableInfo.MemberEntry.TABLE_NAME + "(" + TableInfo.MemberEntry._ID + "))";
@@ -64,8 +63,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(MEMBER_SQL_DELETE_ENTRIES);
         db.execSQL(STEP_SQL_DELETE_ENTRIES);
+        db.execSQL(MEMBER_SQL_DELETE_ENTRIES);
         onCreate(db);
     }
 
@@ -123,7 +122,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE, StepDataStoreModel.getDistance());
         values.put(TableInfo.StepRecordEntry.COLUMN_NAME_START_TIME, StepDataStoreModel.getStartTime());
         values.put(TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME,StepDataStoreModel.getEndTime());
-        values.put(TableInfo.StepRecordEntry.COLUMN_NAME_IMAGE, StepDataStoreModel.getMapImage());
 
         db.insert(TableInfo.StepRecordEntry.TABLE_NAME, null, values);
         db.close();
@@ -138,8 +136,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 TableInfo.StepRecordEntry.COLUMN_NAME_START_TIME + ", " +
                 TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME + ", " +
                 TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE + ", " +
-                TableInfo.StepRecordEntry.COLUMN_NAME_COUNT + ", " +
-                TableInfo.StepRecordEntry.COLUMN_NAME_IMAGE +
+                TableInfo.StepRecordEntry.COLUMN_NAME_COUNT +
                 " FROM " + TableInfo.StepRecordEntry.TABLE_NAME +
                 " WHERE " + TableInfo.StepRecordEntry.COLUMN_NAME_MEMBER_ID + " = ?";
 
@@ -151,28 +148,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 int endTimeIndex = cursor.getColumnIndex(TableInfo.StepRecordEntry.COLUMN_NAME_END_TIME);
                 int distanceIndex = cursor.getColumnIndex(TableInfo.StepRecordEntry.COLUMN_NAME_DISTANCE);
                 int stepsIndex = cursor.getColumnIndex(TableInfo.StepRecordEntry.COLUMN_NAME_COUNT);
-                int imageIndex = cursor.getColumnIndex(TableInfo.StepRecordEntry.COLUMN_NAME_IMAGE);
 
                 String startTime = cursor.getString(startTimeIndex);
                 String endTime = cursor.getString(endTimeIndex);
                 String distance = cursor.getString(distanceIndex);
                 int steps = cursor.getInt(stepsIndex);
-                byte[] imageBytes = cursor.getBlob(imageIndex);
 
-                Bitmap image = null;
-                if (imageBytes != null && imageBytes.length > 0) {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888; // 고품질 색상 구성
-                    image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length,options);
-                    if (image != null) {
-                        System.out.println("Bitmap 생성 성공: " + image.getWidth() + "x" + image.getHeight());
-                    } else {
-                        System.out.println("Bitmap 생성 실패");
-                    }
-                } else {
-                    System.out.println("이미지 데이터가 비어있습니다."); // 디버깅용
-                }
-                records.add(new Record(startTime, endTime, distance,steps, image));
+                records.add(new Record(startTime, endTime, distance,steps));
             } while(cursor.moveToNext());
         }
         cursor.close();

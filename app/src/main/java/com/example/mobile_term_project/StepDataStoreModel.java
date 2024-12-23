@@ -8,7 +8,6 @@ public class StepDataStoreModel {
     private static String startTime;
     private static String endTime;
     private static String distance;
-    private static byte[] mapImage;
 
     public static void setMemberId(int id){
         memberId = id;
@@ -43,13 +42,6 @@ public class StepDataStoreModel {
     }
     public static String getDistance(){
         return distance;
-    }
-
-    public static void setMapImage(byte[] Image){
-        mapImage = Image;
-    }
-    public static byte[] getMapImage(){
-        return mapImage;
     }
 
 }

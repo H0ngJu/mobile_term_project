@@ -1,6 +1,7 @@
 package com.example.mobile_term_project;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import androidx.lifecycle.ViewModel;
 
@@ -17,7 +18,6 @@ public class StepDataViewModel extends ViewModel {
         StepDataStoreModel.setStartTime(null);
         StepDataStoreModel.setEndTime(null);
         StepDataStoreModel.setDistance(null);
-        StepDataStoreModel.setMapImage(null);
     }
     //측정 시작 시
     public void startStepData(int memberId){
@@ -25,11 +25,10 @@ public class StepDataViewModel extends ViewModel {
         StepDataStoreModel.setStartTime(currentTime());
     }
     //측정 종료 시
-    public void saveStepData(int steps, double distance, Bitmap map){
+    public void saveStepData(int steps, double distance) {
         StepDataStoreModel.setStepCount(steps);
         StepDataStoreModel.setEndTime(currentTime());
         StepDataStoreModel.setDistance(formatDistance(distance));
-        StepDataStoreModel.setMapImage(convertBitmapToByteArray(map));
     }
 
     public String currentTime(){
@@ -46,11 +45,4 @@ public class StepDataViewModel extends ViewModel {
             return (int)distance + " M";
         }
     }
-
-    private byte[] convertBitmapToByteArray(Bitmap bitmap){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        return stream.toByteArray();
-    }
-
 }

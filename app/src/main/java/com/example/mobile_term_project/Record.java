@@ -7,20 +7,17 @@ public class Record {
     String endTime;
     String distance;
     int steps;
-    Bitmap image;
 
-    public Record(String start, String end, String distance, int steps, Bitmap image) {
+    public Record(String start, String end, String distance, int steps) {
         this.startTime = start;
         this.endTime = end;
         this.distance = distance;
         this.steps = steps;
-        this.image = image;
     }
 
     public String getStartTime() {return startTime;}
     public String getEndTime() {return endTime;}
     public String getDistance() {return distance;}
     public int getSteps() {return steps;}
-    public Bitmap getImage() {return image;}
 }
 
