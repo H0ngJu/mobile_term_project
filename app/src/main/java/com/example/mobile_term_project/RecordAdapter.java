@@ -1,18 +1,12 @@
 package com.example.mobile_term_project;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -42,17 +36,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
         holder.distanceTextView.setText(record.getDistance());
         holder.stepsTextView.setText(record.getSteps() + " 보");
-
-        Bitmap image = record.getImage();
-        if (image != null) {
-            Bitmap scale = Bitmap.createScaledBitmap(image, 100,100,true);
-            System.out.println("Bitmap 크기: " + scale.getWidth() + "x" + scale.getHeight());
-            System.out.println(scale);
-            holder.routeImageView.setImageBitmap(scale); // Bitmap 설정
-
-        } else {
-            holder.routeImageView.setImageResource(R.drawable.sample); // 기본 이미지
-        }
     }
 
     @Override
@@ -62,14 +45,12 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
     static class RecordViewHolder extends RecyclerView.ViewHolder {
         TextView TimeTextView, distanceTextView, stepsTextView;
-        ImageView routeImageView;
 
         public RecordViewHolder(@NonNull View itemView) {
             super(itemView);
             TimeTextView = itemView.findViewById(R.id.timeTextView);
             distanceTextView = itemView.findViewById(R.id.distanceTextView);
             stepsTextView = itemView.findViewById(R.id.stepsTextView);
-            routeImageView = itemView.findViewById(R.id.routeImageView);
         }
     }
 

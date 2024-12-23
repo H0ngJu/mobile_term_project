@@ -143,9 +143,9 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 // 데이터 저장
-                Bitmap bitmap = captureView(mapView);
-                stepDataViewModel.saveStepData(stepCount, totalDistance, bitmap);
+                stepDataViewModel.saveStepData(stepCount, totalDistance);
                 sqLiteHelper.addStepData();
 
                 Toast.makeText(RouteStepActivity.this, "걸음 수 저장 완료: " + stepCount, Toast.LENGTH_SHORT).show();
@@ -162,13 +162,6 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             }
         });
     }
-    private Bitmap captureView(View view) {
-        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-        return bitmap;
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
