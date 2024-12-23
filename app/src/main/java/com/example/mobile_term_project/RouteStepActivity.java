@@ -103,8 +103,13 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             double lng = location.getLongitude();
 
             Log.d("location", "업데이트 된 위치: 위도: " + lat + ", 경도: " + lng);
-            routePath.add(LatLng.from(lat,lng));
-            updateRoutePath(routePath);
+
+            if(routePath.size() <= 1){ //routeline이 초기화 되지 않음
+                setInitialRoute(location);
+            }else{
+                routePath.add(LatLng.from(lat,lng));
+                updateRoutePath(routePath);
+            }
 
             String formatDistance = calculateDistance();
             distanceText.setText("이동 거리 : " + formatDistance);
@@ -123,10 +128,12 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                         100);
             } else {
                 initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
+                locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 3000,1,locationListener);
                 initializeSensor();
             }
         } else {
             initializeMapView(); //권한이 이미 허용된 경우 지도 초기화
+            locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 3000,1,locationListener);
             initializeSensor();
         }
 
@@ -178,6 +185,7 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                 // 위치 권한이 허용된 경우
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     initializeMapView();
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
                     Toast.makeText(this, "위치 권한 허용", Toast.LENGTH_SHORT).show();
                 }
             } else {
@@ -211,8 +219,9 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
             return;
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
-            Log.d("location", "LocationListener 재 등록 완료");
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
+            Log.d("location", "LocationListener 재등록 완료");
         } else {
             Log.e("location", "위치 권한이 없습니다.");
         }
@@ -304,7 +313,6 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
                                     }
                                 }, null);
                             }
-                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationListener);
                         } else {
                             Log.e(TAG, "위치 권한이 없습니다.");
                         }
