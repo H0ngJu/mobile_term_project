@@ -72,6 +72,8 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
     private int stepCount = 0;
     private double totalDistance = 0.0; //미터 단위
 
+    private int initialStepCount = -1; // 초기값은 -1로 설정하여 아직 설정되지 않았음을 나타냄
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,12 +143,15 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //걸음 수 저장
+                // 데이터 저장
                 Bitmap bitmap = captureView(mapView);
                 stepDataViewModel.saveStepData(stepCount, totalDistance, bitmap);
                 sqLiteHelper.addStepData();
 
                 Toast.makeText(RouteStepActivity.this, "걸음 수 저장 완료: " + stepCount, Toast.LENGTH_SHORT).show();
+
+                // 초기값 업데이트 (다음 측정을 위해)
+                initialStepCount = -1; // 초기화
 
                 // 다음 Activity로 이동
                 Intent intent = new Intent(RouteStepActivity.this, EndofStepCounterActivity.class);
@@ -260,9 +265,14 @@ public class RouteStepActivity extends AppCompatActivity implements SensorEventL
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            Log.d("StepCounterActivity", "Step Counter Event 감지: " + event.values[0]);
-            stepCount = (int) event.values[0];
+            if (initialStepCount == -1) {
+                // 측정을 처음 시작하는 경우 현재 값을 초기값으로 설정
+                initialStepCount = (int) event.values[0];
+            }
+            // 현재 걸음 수 = 센서 값 - 초기값
+            stepCount = (int) event.values[0] - initialStepCount;
             stepCountText.setText(String.valueOf(stepCount));
+            Log.d("StepCounterActivity", "Step Counter Event 감지: " + event.values[0] + ", 초기값: " + initialStepCount);
         }
     }
 

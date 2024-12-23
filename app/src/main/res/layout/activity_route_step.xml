@@ -4,33 +4,53 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+  <!-- Kakao MapView -->
   <com.kakao.vectormap.MapView
       android:id="@+id/map_view"
       android:layout_width="match_parent"
       android:layout_height="500sp" />
 
+  <!-- 중앙 정렬을 위한 LinearLayout -->
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
+      android:gravity="center"
       android:background="#FFFFFF">
 
+    <!-- "현재 걸음 수" 텍스트 -->
+    <TextView
+        android:id="@+id/currentStepTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="현재 걸음 수"
+        android:textSize="24sp"
+        android:textColor="#000000"
+        android:layout_marginBottom="10dp"
+        android:gravity="center" />
+
+    <!-- 걸음 수 텍스트 -->
     <TextView
         android:id="@+id/stepCountText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="걸음 수 : "
         android:textSize="30sp"
+        android:textColor="#000000"
         android:gravity="center" />
 
+    <!-- 이동 거리 텍스트 -->
     <TextView
         android:id="@+id/DistanceText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="이동 거리 : 0 M"
         android:textSize="30sp"
-        android:gravity="center" />
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_marginTop="10dp" />
 
+    <!-- 종료하기 버튼 -->
     <Button
         android:id="@+id/stopButton"
         android:layout_width="wrap_content"
@@ -38,7 +58,5 @@
         android:layout_marginTop="20dp"
         android:text="종료하기" />
 
-
   </LinearLayout>
-
-  </LinearLayout>
+</LinearLayout>

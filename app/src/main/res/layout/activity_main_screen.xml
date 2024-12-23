@@ -1,47 +1,127 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/white">
 
-    <TextView
-        android:id="@+id/nicknameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="User님의 기록"
-        android:textSize="20sp"
-        android:padding="10dp"
-        android:textColor="#000000" />
-
+    <!-- 프로필 이미지와 닉네임 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@color/design_default_color_primary"
-        android:text="로그아웃"
-        android:layout_marginRight="15sp"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
 
-    <Button
-        android:id="@+id/stepButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@color/design_default_color_primary"
-        android:text="측정하기"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        <ImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/images"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="Profile Image" />
+
+        <TextView
+            android:id="@+id/nicknameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User님의 기록"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:gravity="center"
+            android:textColor="@color/black" />
     </LinearLayout>
 
+    <!-- 버튼 그룹 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="@drawable/rounded_background">
+
+        <!-- 로그아웃 버튼 -->
+        <LinearLayout
+            android:id="@+id/logoutLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/baseline_logout_24"
+                android:contentDescription="Logout Icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="로그아웃"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- 측정하기 버튼 -->
+        <LinearLayout
+            android:id="@+id/stepLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/baseline_directions_walk_24"
+                android:contentDescription="Step Icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="측정하기"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- 랭킹 보기 버튼 -->
+        <LinearLayout
+            android:id="@+id/rankingLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/baseline_format_list_numbered_24"
+                android:contentDescription="Ranking Icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="랭킹 보기"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recordRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:background="@color/white"
+        android:padding="10dp"
+        android:clipToPadding="false"
+        android:elevation="4dp" />
 </LinearLayout>

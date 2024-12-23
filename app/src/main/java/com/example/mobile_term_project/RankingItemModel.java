@@ -16,4 +16,5 @@ public class RankingItemModel {
     public int getSteps() {
         return steps;
     }
+
 }
